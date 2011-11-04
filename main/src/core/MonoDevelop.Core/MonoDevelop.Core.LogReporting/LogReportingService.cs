@@ -24,14 +24,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.IO;
+using System.Threading;
 
 namespace MonoDevelop.Core.LogReporting
 {
 	public static class LogReportingService
 	{
+		public static readonly FilePath CrashLogDirectory = UserProfile.Current.LogDir.Combine ("LogAgent");
+		
 		const string ReportCrashesKey = "MonoDevelop.LogAgent.ReportCrashes";
 		const string ReportUsageKey = "MonoDevelop.LogAgent.ReportUsage";
-		public static readonly FilePath CrashLogDirectory = UserProfile.Current.LogDir.Combine ("LogAgent");
+		
+		static int CrashId;
 		
 		public static bool? ReportCrashes {
 			get { return PropertyService.Get<bool?> (ReportCrashesKey); }
@@ -41,6 +46,15 @@ namespace MonoDevelop.Core.LogReporting
 		public static bool? ReportUsage {
 			get { return PropertyService.Get<bool?> (ReportUsageKey); }
 			set { PropertyService.Set (ReportUsageKey, value); }
+		}
+		
+		public static void ReportUnhandledException (Exception ex)
+		{
+			if (!Directory.Exists (CrashLogDirectory))
+				Directory.CreateDirectory (CrashLogDirectory);
+			
+			var filename = string.Format ("{0}.{1}.log", SystemInformation.SessionUuid, Interlocked.Increment (ref CrashId));
+			File.WriteAllText (CrashLogDirectory.Combine (filename), ex.ToString ());
 		}
 	}
 }
