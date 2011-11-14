@@ -22,7 +22,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
 using System.IO;
 using System.Text;
@@ -37,7 +36,7 @@ namespace MonoDevelop.SourceEditor.OptionPanels
 {
 	public partial class HighlightingPanel : Gtk.Bin, IOptionsPanel
 	{
-		ListStore styleStore = new ListStore (typeof (string), typeof (Mono.TextEditor.Highlighting.ColorSheme));
+		ListStore styleStore = new ListStore (typeof(string), typeof(Mono.TextEditor.Highlighting.ColorSheme));
 		
 		public HighlightingPanel ()
 		{
@@ -69,6 +68,7 @@ namespace MonoDevelop.SourceEditor.OptionPanels
 			this.buttonEdit.Clicked += HandleButtonEdithandleClicked;
 			this.buttonNew.Clicked += HandleButtonNewClicked;
 			this.buttonExport.Clicked += HandleButtonExportClicked;
+			this.buttonImport.Clicked += HandleButtonImportClicked;
 			this.enableHighlightingCheckbutton.Active = DefaultSourceEditorOptions.Instance.EnableSyntaxHighlighting;
 			this.enableSemanticHighlightingCheckbutton.Hide ();
 //			this.enableSemanticHighlightingCheckbutton.Active = DefaultSourceEditorOptions.Instance.EnableSemanticHighlighting;
@@ -78,6 +78,52 @@ namespace MonoDevelop.SourceEditor.OptionPanels
 			ShowStyles ();
 			HandleStyleTreeviewSelectionChanged (null, null);
 			return this;
+		}
+
+		void HandleButtonImportClicked (object sender, EventArgs e)
+		{
+			var dialog = new SelectFileDialog (GettextCatalog.GetString ("Highlighting Scheme"), Gtk.FileChooserAction.Open)
+				{
+					TransientFor = this.Toplevel as Gtk.Window,
+				};
+			dialog.AddFilter ("Visual Studio 2010 settings file", "*.vssettings");
+			dialog.AddFilter ("XML file", "*.xml");
+			if (!dialog.Run ())
+				return;
+			
+			var defStyle = Mono.TextEditor.Highlighting.SyntaxModeService.GetColorStyle (this.Style, "Default");
+			var style = defStyle.Clone ();   
+			var vsImporter = new VisualStudioHighlitingSchemeImporter ();  
+			
+			style.Name = "Absolutely new style";
+			style.Description = "Absolutely new style description";
+			
+			var path = SourceEditorDisplayBinding.SyntaxModePath;
+			var baseName = style.Name.Replace (" ", "_");
+			
+			while (File.Exists (System.IO.Path.Combine (path, baseName + "Style.xml")))
+			{
+				baseName = baseName + "_";
+			}
+			
+			var fileName = System.IO.Path.Combine (path, baseName + "Style.xml");
+			
+			try
+			{
+				vsImporter.Import (dialog.SelectedFile, style);
+				MonoDevelop.Ide.MessageService.ShowMessage (fileName);
+				style.Save (fileName);
+				Mono.TextEditor.Highlighting.SyntaxModeService.AddStyle (fileName, style);
+			}
+ 			catch (Exception ex)
+			{
+				MonoDevelop.Ide.MessageService.ShowException (ex);
+			}
+			
+			//var fileName = Mono.TextEditor.Highlighting.SyntaxModeService.GetFileNameForStyle (style);
+			
+			
+			//style.Save (fileName);
 		}
 
 		void HandleButtonNewClicked (object sender, EventArgs e)
@@ -253,6 +299,7 @@ namespace MonoDevelop.SourceEditor.OptionPanels
 				DefaultSourceEditorOptions.Instance.ColorScheme = sheme != null ? sheme.Name : null;
 			}
 		}
+
 		OptionsDialog dialog;
 		
 		public void Initialize (OptionsDialog dialog, object dataObject)

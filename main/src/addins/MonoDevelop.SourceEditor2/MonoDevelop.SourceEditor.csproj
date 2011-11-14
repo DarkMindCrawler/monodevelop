@@ -153,6 +153,7 @@
     <Compile Include="gtk-gui\MonoDevelop.SourceEditor.OptionPanels.ColorShemeEditor.cs" />
     <Compile Include="MonoDevelop.SourceEditor.OptionPanels\NewColorShemeDialog.cs" />
     <Compile Include="gtk-gui\MonoDevelop.SourceEditor.OptionPanels.NewColorShemeDialog.cs" />
+    <Compile Include="MonoDevelop.SourceEditor.OptionPanels\VisualStudioHighlitingSchemeImporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">

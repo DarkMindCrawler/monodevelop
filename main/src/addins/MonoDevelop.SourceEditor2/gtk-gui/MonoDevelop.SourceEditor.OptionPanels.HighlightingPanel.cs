@@ -23,6 +23,7 @@ namespace MonoDevelop.SourceEditor.OptionPanels
 		private global::Gtk.Button addButton;
 		private global::Gtk.Button removeButton;
 		private global::Gtk.Button buttonExport;
+		private global::Gtk.Button buttonImport;
 		
 		protected virtual void Build ()
 		{
@@ -201,16 +202,28 @@ namespace MonoDevelop.SourceEditor.OptionPanels
 			w17.Position = 2;
 			w17.Expand = false;
 			w17.Fill = false;
-			this.vbox5.Add (this.hbox2);
-			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox2]));
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.buttonImport = new global::Gtk.Button ();
+			this.buttonImport.CanFocus = true;
+			this.buttonImport.Name = "buttonImport";
+			this.buttonImport.UseUnderline = true;
+			this.buttonImport.Label = global::Mono.Unix.Catalog.GetString ("Import");
+			this.hbox2.Add (this.buttonImport);
+			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.buttonImport]));
 			w18.PackType = ((global::Gtk.PackType)(1));
-			w18.Position = 1;
+			w18.Position = 3;
 			w18.Expand = false;
 			w18.Fill = false;
+			this.vbox5.Add (this.hbox2);
+			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.hbox2]));
+			w19.PackType = ((global::Gtk.PackType)(1));
+			w19.Position = 1;
+			w19.Expand = false;
+			w19.Fill = false;
 			this.GtkAlignment.Add (this.vbox5);
 			this.vbox4.Add (this.GtkAlignment);
-			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox4 [this.GtkAlignment]));
-			w20.Position = 3;
+			global::Gtk.Box.BoxChild w21 = ((global::Gtk.Box.BoxChild)(this.vbox4 [this.GtkAlignment]));
+			w21.Position = 3;
 			this.Add (this.vbox4);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
